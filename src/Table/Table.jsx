@@ -1,4 +1,5 @@
 import React from "react";
+import "./Table.css";
 import { ProTable } from "@ant-design/pro-components";
 const Table = () => {
   const columns = [
@@ -11,6 +12,7 @@ const Table = () => {
       title: "Title",
       dataIndex: "title",
       ellipsis: true,
+      editable: true,
       tip: "Title of the task to be done",
       formItemProps: {
         rules: [
@@ -77,42 +79,42 @@ const Table = () => {
       status: "In Progress",
     },
     {
-      title: "Task 1",
+      title: "Task 2",
       description: "complete the task",
       due_date: "08/04/23",
       tag: "red",
       status: "In Progress",
     },
     {
-      title: "Task 1",
+      title: "Task 3",
       description: "complete the task",
       due_date: "08/04/23",
       tag: "red",
       status: "",
     },
     {
-      title: "Task 1",
+      title: "Task 4",
       description: "complete the task",
       due_date: "08/04/23",
       tag: "red",
       status: "In Progress",
     },
     {
-      title: "Task 1",
+      title: "Task 5",
       description: "complete the task",
       due_date: "08/04/23",
       tag: "red",
       status: "In Progress",
     },
     {
-      title: "Task 1",
+      title: "Task 6",
       description: "complete the task",
       due_date: "08/04/23",
       tag: "red",
       status: "In Progress",
     },
     {
-      title: "Task 1",
+      title: "Task 7",
       description: "complete the task",
       due_date: "08/04/23",
       tag: "red",
@@ -126,12 +128,21 @@ const Table = () => {
         columns={columns}
         dataSource={data}
         cardBordered
-        rowKey="key"
         search={{
           labelWidth: "auto",
         }}
         pagination={{
           pageSize: 5,
+        }}
+        rowKey="id"
+        editable={{
+          type: "single",
+          onSave: async (rowKey, data, row) => {
+            // Handle save logic here
+          },
+          onDelete: async (rowKey, row) => {
+            // Handle delete logic here
+          },
         }}
         dateFormatter="string"
         headerTitle="Simple Table"
