@@ -1,12 +1,12 @@
 import React from "react";
-import Task from "./Task";
+import Table from "./Table/Table";
 
 function App() {
   return (
     <div className="App">
       <div className="title">To DO List</div>
       <div>
-        <Task />
+        <Table />
       </div>
     </div>
   );
