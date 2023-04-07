@@ -1,151 +1,183 @@
 import React from "react";
-import "./Table.css";
-import { ProTable } from "@ant-design/pro-components";
+import { useState } from "react";
+import { EditableProTable, ProFormRadio } from "@ant-design/pro-components";
+const waitTime = (time = 100) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, time);
+  });
+};
+const defaultData = [
+  {
+    id: 624748504,
+    title: "Task 1",
+    description: "description 1",
+    state: "open",
+    timestamp: "1590486176000",
+    update_at: "1590486176000",
+  },
+  {
+    id: 624691229,
+    title: "Task 2",
+    description: "description 2",
+    state: "closed",
+    created_at: "1590481162000",
+    due_date: "08/04/23",
+  },
+];
 const Table = () => {
+  const [editableKeys, setEditableRowKeys] = useState([]);
+  const [dataSource, setDataSource] = useState([]);
+  const [position, setPosition] = useState("bottom");
+  const timestamp = Date.now();
+  const id = React.key;
   const columns = [
     {
-      dataIndex: "index",
-      valueType: "indexBorder",
-      width: 48,
-    },
-    {
-      title: "Title",
+      title: "Tasks",
       dataIndex: "title",
-      ellipsis: true,
-      editable: true,
-      tip: "Title of the task to be done",
-      formItemProps: {
-        rules: [
-          {
-            required: true,
-            message: "enter title",
-          },
-        ],
+      tooltip: "task to be completed",
+      formItemProps: (form, { rowIndex }) => {
+        return {
+          rules:
+            rowIndex > 1
+              ? [{ required: true, message: "This is required" }]
+              : [],
+        };
       },
-    },
-
-    {
-      title: "Description",
-      dataIndex: "description",
-      ellipsis: true,
-      tip: " Description of the task to be done.",
+      editable: (text, record, index) => {
+        return index !== 0;
+      },
+      width: "15%",
     },
     {
-      title: "Due Date",
-      dataIndex: "due_date",
-      valueType: "date",
-      hideInTable: true,
-      ellipsis: true,
-      tip: "Expected due date to finish the task",
-    },
-    {
-      title: "Timestamp",
-      dataIndex: "created_at_time",
-      valueType: "time",
-      ellipsis: true,
-    },
-    {
-      disable: true,
-      title: "STATUS",
-      dataIndex: "status",
-      filters: true,
-      onFilter: true,
-      ellipsis: true,
+      title: "status",
+      key: "state",
+      dataIndex: "state",
       valueType: "select",
       valueEnum: {
+        all: { text: "all", status: "open" },
         open: {
-          text: "Error",
+          text: "incomplete",
           status: "Error",
         },
         closed: {
-          text: "Success",
+          text: "completed",
           status: "Success",
-          disabled: true,
-        },
-        processing: {
-          text: "DOING",
-          status: "Processing",
         },
       },
     },
-  ];
-
-  const data = [
     {
-      title: "Task 1",
-      description: "complete the task",
-      due_date: "08/04/23",
-      tag: "red",
-      status: "In Progress",
+      title: "description",
+      dataIndex: "description",
+      fieldProps: (form, { rowKey, rowIndex }) => {
+        if (form.getFieldValue([rowKey || "", "title"]) === "不好玩") {
+          return {
+            disabled: true,
+          };
+        }
+        if (rowIndex > 9) {
+          return {
+            disabled: true,
+          };
+        }
+        return {};
+      },
     },
     {
-      title: "Task 2",
-      description: "complete the task",
-      due_date: "08/04/23",
-      tag: "red",
-      status: "In Progress",
+      title: "due_date",
+      dataIndex: "due_date",
+      valueType: "date",
     },
     {
-      title: "Task 3",
-      description: "complete the task",
-      due_date: "08/04/23",
-      tag: "red",
-      status: "",
+      title: "created_at",
+      dataIndex: "timestamp",
+      valueType: { timestamp },
     },
     {
-      title: "Task 4",
-      description: "complete the task",
-      due_date: "08/04/23",
-      tag: "red",
-      status: "In Progress",
-    },
-    {
-      title: "Task 5",
-      description: "complete the task",
-      due_date: "08/04/23",
-      tag: "red",
-      status: "In Progress",
-    },
-    {
-      title: "Task 6",
-      description: "complete the task",
-      due_date: "08/04/23",
-      tag: "red",
-      status: "In Progress",
-    },
-    {
-      title: "Task 7",
-      description: "complete the task",
-      due_date: "08/04/23",
-      tag: "red",
-      status: "In Progress",
+      title: "option",
+      valueType: "option",
+      width: 200,
+      render: (text, record, _, action) => [
+        <a
+          href="#"
+          key="editable"
+          onClick={() => {
+            action?.startEditable?.(record.id);
+          }}
+        >
+          edit
+        </a>,
+        <a
+          href="#"
+          key="delete"
+          onClick={() => {
+            setDataSource(dataSource.filter((item) => item.id !== record.id));
+          }}
+        >
+          delete
+        </a>,
+      ],
     },
   ];
 
   return (
     <div>
-      <ProTable
+      <EditableProTable
+        headerTitle="to do List"
+        maxLength={5}
+        scroll={{
+          x: 960,
+        }}
+        recordCreatorProps={
+          position !== "hidden"
+            ? {
+                position: "top",
+                record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
+              }
+            : false
+        }
+        loading={false}
+        toolBarRender={() => [
+          <ProFormRadio.Group
+            key="render"
+            fieldProps={{
+              value: position,
+              onChange: (e) => setPosition(e.target.value),
+            }}
+            options={[
+              {
+                label: "top",
+                value: "top",
+              },
+              {
+                label: "bottom",
+                value: "bottom",
+              },
+              {
+                label: "hide",
+                value: "hidden",
+              },
+            ]}
+          />,
+        ]}
         columns={columns}
-        dataSource={data}
-        cardBordered
-        search={{
-          labelWidth: "auto",
-        }}
-        pagination={{
-          pageSize: 5,
-        }}
-        rowKey="id"
+        request={async () => ({
+          data: defaultData,
+          total: 3,
+          success: true,
+        })}
+        value={dataSource}
+        onChange={setDataSource}
         editable={{
-          type: "single",
+          type: "multiple",
+          editableKeys,
           onSave: async (rowKey, data, row) => {
-            // Handle save logic here
+            console.log(rowKey, data, row);
+            await waitTime(2000);
           },
-          onDelete: async (rowKey, row) => {
-            // Handle delete logic here
-          },
+          onChange: setEditableRowKeys,
         }}
-        dateFormatter="string"
-        headerTitle="Simple Table"
       />
     </div>
   );
